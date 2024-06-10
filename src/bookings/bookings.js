@@ -16,16 +16,19 @@ bookingsRouter.get("/", async (req, res, next) => {
 
 bookingsRouter.post("/register", async(req, res, next) => {
     try {
-        console.log("register=",req.body)
-        // const allGuests = await GuestModel.find({phoneNumber:req.body.phoneNumber})
-        // if(allGuests.length < 1) {
-        //     const newGuest = new GuestModel({...req.body.guest})
-        //     const addedGuest = await newGuest.save()
-        // }
-        // const newBooking = {guests:addedGuest._id}
-        // new BookingModel()
-        // const booking = await newBooking.save()
-        // res.send({message : "You have successfully booked"})
+        const allGuests = await GuestModel.findOne({phoneNumber:req.body.phoneNumber})
+        let guestId = allGuests?._id
+        if(allGuests?._id !== null) {
+            const newGuest = new GuestModel(req.body.guest)
+            const addedGuest = await newGuest.save()
+            guestId = addedGuest._id
+        }
+        const newBooking = {guest:guestId,bookedDate : req.body.bookedDate, bookedTime : req.body.bookedTime}
+        const addBooking = new BookingModel(newBooking)
+        const booking = await addBooking.save()
+        const updatedGuest = await GuestModel.findByIdAndUpdate(guestId, {$push:{bookings:booking._id}},{new : true})
+
+        res.send({message : "You have successfully booked", input:req.body, guestId, booking, updatedGuest })
     } catch (error) {
         console.error(error)
     }

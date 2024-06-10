@@ -4,7 +4,9 @@ const {Schema, model} = mongoose;
 
 const BookingSchema = new Schema({
     status : {type : String, enum : ['booked', 'no-show', 'cancelled', 'fulfilled'], default : "booked"},
-    guests : {type : Schema.Types.ObjectId, ref : "guests"}
+    bookedDate : {type : String, required : true},
+    bookedTime : {type : String, required : true},
+    guest : {type : Schema.Types.ObjectId, ref : "guests"}
 },{
     timestamps : true
 })
